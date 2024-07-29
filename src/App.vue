@@ -1,6 +1,6 @@
 <script setup>
 import Header from './components/HeaderComponent.vue'
-import { ref, provide, onMounted, computed } from 'vue'
+import { ref, provide, onMounted, computed, watch } from 'vue'
 import Drawer from './components/DrawerComponent.vue'
 import axios from 'axios'
 const openCart = ref(false)
@@ -12,11 +12,14 @@ const closeDrawer = () => {
   openCart.value = false
 }
 const items = ref([])
-const totalAmount = computed(() => {
-  return items.value.reduce((sum, item) => {
+
+const totalAmount = ref(0)
+
+const calculateTotalAmount = () => {
+  totalAmount.value = items.value.reduce((sum, item) => {
     return sum + (item.isAdded ? item.price : 0)
   }, 0)
-})
+}
 
 const fetchItems = async () => {
   try {
@@ -35,6 +38,7 @@ const fetchItems = async () => {
       })
 
     items.value = updatedItems
+    calculateTotalAmount()
   } catch (error) {
     console.log(error)
   }
@@ -50,11 +54,13 @@ const fetchAdded = async () => {
     return []
   }
 }
+
+watch(items, calculateTotalAmount, { deep: true })
+
 onMounted(() => {
   fetchItems()
   fetchAdded()
 })
-
 provide('closeDrawer', closeDrawer)
 </script>
 

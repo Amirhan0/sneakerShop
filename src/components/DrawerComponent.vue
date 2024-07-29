@@ -47,7 +47,6 @@ const onClickAdd = async (item) => {
       const { data } = await axios.post('https://0ea57de40f9742ea.mokky.dev/basket', obj)
       item.isAdded = true
       item.basketId = data.id
-      items.value = [...items.value, item]
     } else {
       await axios.delete(`https://0ea57de40f9742ea.mokky.dev/basket/${item.basketId}`)
       item.isAdded = false

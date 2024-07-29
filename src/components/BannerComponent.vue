@@ -2,7 +2,7 @@
   <div class="bg-F4EFE9 w-900 h-300 m-auto rounded-3xl flex justify-between mt-4">
     <div class="flex mr-8 ml-8 flex-col">
       <div class="mt-3">
-        <img src="/public/image-7.svg" alt="" />
+        <img src="/image-7.svg" alt="" />
       </div>
       <h2 class="font-bold text-3xl mt-10 ml-3">
         <span class="cl-8BB43C">Amirhan Gassanov</span>, <br />
@@ -15,7 +15,7 @@
       </div>
     </div>
     <div class="flex w-620 h-300 ml-3">
-      <img src="/public/image-6.svg" alt="" />
+      <img src="/image-6.svg" alt="" />
     </div>
   </div>
 </template>

@@ -23,17 +23,49 @@
           <span>Закладки</span>
         </li>
       </router-link>
-      <li class="flex items-center gap-3 cursor-pointer text-gray-500 hover:text-black">
-        <img src="/profile.svg" alt="" />
-        <span>Профиль</span>
-      </li>
+      <template v-if="user">
+        <router-link :to="`/profile/${user.username}`">
+          <li class="flex items-center gap-3 cursor-pointer text-gray-500 hover:text-black">
+            <img src="/profile.svg" alt="">
+            <span>{{ user.username }}</span>
+          </li>
+        </router-link>
+      </template>
+      <template v-else>
+        <router-link to="/profile">
+          <li class=  "flex items-center gap-3 cursor-pointer text-gray-500 hover:text-black">
+            <img src="/profile.svg" alt="" />
+            <span>Профиль</span>
+          </li>
+        </router-link>
+      </template>
     </ul>
   </header>
 </template>
 
 <script setup>
+import { onMounted, ref, watch, watchEffect } from 'vue'
+
 const props = defineProps({
   totalAmount: Number,
   openDrawer: Function
+})
+
+const user = ref(null)
+
+const updateUser = () => {
+  const storedUser = localStorage.getItem('user')
+  if (storedUser) {
+    user.value = JSON.parse(storedUser)
+  } else {
+    user.value = null
+  }
+}
+
+onMounted(() => {
+  updateUser()
+})
+watchEffect(() => {
+  updateUser()
 })
 </script>
