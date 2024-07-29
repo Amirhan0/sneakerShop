@@ -47,7 +47,6 @@ const fetchItems = async () => {
 const fetchAdded = async () => {
   try {
     const { data: added } = await axios.get(`https://0ea57de40f9742ea.mokky.dev/basket`)
-    console.log(added)
     return added
   } catch (error) {
     console.log(error)

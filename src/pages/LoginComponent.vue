@@ -29,14 +29,6 @@
             {{ errors.passwordUser }}
           </p>
         </div>
-        <div class="mb-4">
-          <p class="text-gray-700 cursor-pointer">
-            Нет профиля?
-            <router-link to="/profile">
-              <span class="cl-8BB43C cursor-pointer">Зарегистрироваться</span>
-            </router-link>
-          </p>
-        </div>
         <button type="submit" class="w-full bg-A5D364 text-white p-2 rounded hover:bg-blue-600">
           Войти
         </button>
@@ -48,8 +40,11 @@
 <script setup>
 import axios from 'axios'
 import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const form = reactive({
+  username: '',
   email: '',
   passwordUser: ''
 })
@@ -92,11 +87,16 @@ const userAutorizhation = async () => {
         passwordUser: form.passwordUser
       }
     })
-
-    console.log(response)
-    return response.data.some(
-      (user) => user.email === form.email && user.passwordUser === form.passwordUser
-    )
+    if (
+      response.data.some(
+        (user) => user.email === form.email && user.passwordUser === form.passwordUser
+      )
+    ) {
+      router.push('/')
+      return true
+    } else {
+      return false
+    }
   } catch (error) {
     console.log(error)
     return false

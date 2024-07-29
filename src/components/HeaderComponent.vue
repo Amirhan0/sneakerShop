@@ -26,14 +26,14 @@
       <template v-if="user">
         <router-link :to="`/profile/${user.username}`">
           <li class="flex items-center gap-3 cursor-pointer text-gray-500 hover:text-black">
-            <img src="/profile.svg" alt="">
+            <img :src="avatarUrl" class="w-12 h-12" alt="" />
             <span>{{ user.username }}</span>
           </li>
         </router-link>
       </template>
       <template v-else>
         <router-link to="/profile">
-          <li class=  "flex items-center gap-3 cursor-pointer text-gray-500 hover:text-black">
+          <li class="flex items-center gap-3 cursor-pointer text-gray-500 hover:text-black">
             <img src="/profile.svg" alt="" />
             <span>Профиль</span>
           </li>
@@ -52,11 +52,13 @@ const props = defineProps({
 })
 
 const user = ref(null)
+const avatarUrl = ref('')
 
 const updateUser = () => {
   const storedUser = localStorage.getItem('user')
   if (storedUser) {
     user.value = JSON.parse(storedUser)
+    avatarUrl.value = localStorage.getItem('avatarUrl')
   } else {
     user.value = null
   }

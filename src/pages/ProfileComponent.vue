@@ -45,14 +45,6 @@
             {{ errors.passwordUser }}
           </p>
         </div>
-        <div class="mb-4">
-          <p class="text-gray-700 cursor-pointer">
-            Уже есть профиль?
-            <router-link to="/login">
-              <span class="cl-8BB43C cursor-pointer">Войти</span>
-            </router-link>
-          </p>
-        </div>
         <button type="submit" class="w-full bg-A5D364 text-white p-2 rounded hover:bg-blue-600">
           Зарегистрироваться
         </button>
@@ -122,8 +114,9 @@ const userRegistration = async () => {
       passwordUser: form.passwordUser
     })
     localStorage.setItem('user', JSON.stringify({ username: response.data.username }))
+    localStorage.setItem('email', JSON.stringify({ email: response.data.email }))
     console.log(response.data)
-    router.push('/')
+    router.push('/login')
   } catch (error) {
     console.log(error)
   }
