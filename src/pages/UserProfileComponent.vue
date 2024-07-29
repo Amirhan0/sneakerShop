@@ -63,6 +63,7 @@ const handleFileChange = (event) => {
 const logOut = () => {
   localStorage.removeItem('user')
   localStorage.removeItem('avatarUrl')
+  localStorage.removeItem('email')
   router.push('/')
 }
 </script>

@@ -45,6 +45,13 @@
             {{ errors.passwordUser }}
           </p>
         </div>
+        <div class="mb-4">
+          <p class="text-gray-700 mb-2">
+            Уже есть профиль?<router-link to="/login">
+              <span class="cursor-pointer cl-8BB43C"> Войти</span></router-link
+            >
+          </p>
+        </div>
         <button type="submit" class="w-full bg-A5D364 text-white p-2 rounded hover:bg-blue-600">
           Зарегистрироваться
         </button>

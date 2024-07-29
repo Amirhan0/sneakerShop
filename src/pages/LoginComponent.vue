@@ -29,6 +29,13 @@
             {{ errors.passwordUser }}
           </p>
         </div>
+        <div class="mb-4">
+          <p class="text-gray-700 mb-2">
+            Нет профиля?<router-link to="/profile">
+              <span class="cursor-pointer cl-8BB43C"> Зарегистрироваться</span></router-link
+            >
+          </p>
+        </div>
         <button type="submit" class="w-full bg-A5D364 text-white p-2 rounded hover:bg-blue-600">
           Войти
         </button>
@@ -78,7 +85,6 @@ const validate = () => {
   }
   return valid
 }
-
 const userAutorizhation = async () => {
   try {
     const response = await axios.get('https://b6024bc21b8a6872.mokky.dev/users', {
@@ -87,19 +93,33 @@ const userAutorizhation = async () => {
         passwordUser: form.passwordUser
       }
     })
-    if (
-      response.data.some(
-        (user) => user.email === form.email && user.passwordUser === form.passwordUser
-      )
-    ) {
-      router.push('/')
-      return true
+
+    const user = response.data.find(
+      (user) => user.email === form.email && user.passwordUser === form.passwordUser
+    )
+
+    if (user) {
+      const userData = {
+        username: user.username,
+        email: user.email,
+        passwordUser: user.passwordUser
+      }
+      
+      if (userData.username && userData.email && userData.passwordUser) {
+        localStorage.setItem('user', JSON.stringify({ username: user.username }))
+        localStorage.setItem('email', JSON.stringify({ email: user.email }))
+        return userData
+      } else {
+        console.log('Пользовательские данные некорректны')
+        return null
+      }
     } else {
-      return false
+      console.log('Пользователь не найден или неверный пароль')
+      return null
     }
   } catch (error) {
-    console.log(error)
-    return false
+    console.log('Ошибка при авторизации:', error)
+    return null
   }
 }
 
@@ -108,6 +128,7 @@ const autorizhation = async () => {
     const userEx = await userAutorizhation()
     if (userEx) {
       console.log('Успешно')
+      router.push('/')
     } else {
       console.log('Безуспешно')
     }
