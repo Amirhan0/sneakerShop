@@ -122,6 +122,7 @@ const userRegistration = async () => {
     })
     localStorage.setItem('user', JSON.stringify({ username: response.data.username }))
     localStorage.setItem('email', JSON.stringify({ email: response.data.email }))
+    localStorage.setItem('userId', JSON.stringify({ id: response.data.id }))
     console.log(response.data)
     router.push('/login')
   } catch (error) {

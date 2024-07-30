@@ -41,12 +41,20 @@
 import { ref, onMounted } from 'vue'
 import Card from '../components/CardItem.vue'
 import axios from 'axios'
-
+import { useRouter } from 'vue-router'
 const items = ref([])
+const router = useRouter()
+const isUserAuteh = () => {
+  const userId = localStorage.getItem('userId')
+  return userId !== null
+}
 
 const fetchFavorites = async () => {
+  if (!isUserAuteh()) {
+    return []
+  }
   try {
-    const { data: favorites } = await axios.get('https://269b3b45e08bcd1a.mokky.dev/favorites')
+    const { data: favorites } = await axios.get('https://950fee513fcb3d3b.mokky.dev/favorites')
     return favorites
   } catch (error) {
     console.log(error)
@@ -75,15 +83,20 @@ const fetchItems = async () => {
 }
 
 const addToFavorite = async (item) => {
+  if (!isUserAuteh()) {
+    router.push('/profile')
+    return []
+  }
   try {
     if (!item.isFavorite) {
-      const obj = { sneakerId: item.id }
-      const { data } = await axios.post('https://269b3b45e08bcd1a.mokky.dev/favorites', obj)
+      const userId = JSON.parse(localStorage.getItem('userId'))
+      const obj = { sneakerId: item.id, userId }
+      const { data } = await axios.post('https://950fee513fcb3d3b.mokky.dev/favorites', obj)
       item.isFavorite = true
       item.favoriteId = data.id
     } else {
       if (item.favoriteId) {
-        await axios.delete(`https://269b3b45e08bcd1a.mokky.dev/favorites/${item.favoriteId}`)
+        await axios.delete(`https://950fee513fcb3d3b.mokky.dev/favorites/${item.favoriteId}`)
         item.isFavorite = false
         item.favoriteId = null
       } else {

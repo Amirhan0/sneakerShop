@@ -64,6 +64,7 @@ const logOut = () => {
   localStorage.removeItem('user')
   localStorage.removeItem('avatarUrl')
   localStorage.removeItem('email')
+  localStorage.removeItem('userId')
   router.push('/')
 }
 </script>

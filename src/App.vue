@@ -3,9 +3,15 @@ import Header from './components/HeaderComponent.vue'
 import { ref, provide, onMounted, computed, watch } from 'vue'
 import Drawer from './components/DrawerComponent.vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 const openCart = ref(false)
 const openDrawer = () => {
   openCart.value = true
+}
+const router = useRouter()
+const isUserAuteh = () => {
+  const userId = localStorage.getItem('userId')
+  return userId !== null
 }
 
 const closeDrawer = () => {
@@ -16,6 +22,9 @@ const items = ref([])
 const totalAmount = ref(0)
 
 const calculateTotalAmount = () => {
+  if (!isUserAuteh()) {
+    return 0
+  }
   totalAmount.value = items.value.reduce((sum, item) => {
     return sum + (item.isAdded ? item.price : 0)
   }, 0)

@@ -104,10 +104,11 @@ const userAutorizhation = async () => {
         email: user.email,
         passwordUser: user.passwordUser
       }
-      
+
       if (userData.username && userData.email && userData.passwordUser) {
         localStorage.setItem('user', JSON.stringify({ username: user.username }))
         localStorage.setItem('email', JSON.stringify({ email: user.email }))
+        localStorage.setItem('userId', JSON.stringify({ id: user.id }))
         return userData
       } else {
         console.log('Пользовательские данные некорректны')

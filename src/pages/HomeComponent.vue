@@ -32,8 +32,13 @@ import Cards from '../components/CardsItems.vue'
 import { onMounted, reactive, ref, watch } from 'vue'
 import axios from 'axios'
 import BannerComponent from '../components/BannerComponent.vue'
+import { useRouter } from 'vue-router'
 const items = ref([])
-
+const router = useRouter()
+const isUserAuteh = () => {
+  const userId = localStorage.getItem('userId')
+  return userId !== null
+}
 const filters = reactive({
   sortBy: 'title',
   searchBy: ''
@@ -62,8 +67,11 @@ const fetchItems = async () => {
 }
 
 const fetchFavorites = async () => {
+  if (!isUserAuteh()) {
+    return []
+  }
   try {
-    const { data: favorites } = await axios.get(`https://269b3b45e08bcd1a.mokky.dev/favorites`)
+    const { data: favorites } = await axios.get(`https://950fee513fcb3d3b.mokky.dev/favorites`)
     items.value = items.value.map((item) => {
       const favorite = favorites.find((fav) => fav.sneakerId === item.id)
       if (!favorite) {
@@ -81,15 +89,21 @@ const fetchFavorites = async () => {
 }
 
 const addToFavorite = async (item) => {
+  if (!isUserAuteh()) {
+    alert('Чтоб добавить товар в закладку нужно пройти регистрацию!')
+    router.push('/profile')
+    return []
+  }
   try {
     if (!item.isFavorite) {
-      const obj = { sneakerId: item.id }
-      const { data } = await axios.post('https://269b3b45e08bcd1a.mokky.dev/favorites', obj)
+      const userId = JSON.parse(localStorage.getItem('userId'))
+      const obj = { sneakerId: item.id, userId }
+      const { data } = await axios.post('https://950fee513fcb3d3b.mokky.dev/favorites', obj)
       item.isFavorite = true
       item.favoriteId = data.id
       console.log(item)
     } else {
-      await axios.delete(`https://269b3b45e08bcd1a.mokky.dev/favorites/${item.favoriteId}`)
+      await axios.delete(`https://950fee513fcb3d3b.mokky.dev/favorites/${item.favoriteId}`)
       item.isFavorite = false
     }
   } catch (error) {
@@ -98,6 +112,9 @@ const addToFavorite = async (item) => {
 }
 
 const fetchAdded = async () => {
+  if (!isUserAuteh()) {
+    return []
+  }
   try {
     const { data: added } = await axios.get(`https://0ea57de40f9742ea.mokky.dev/basket`)
     items.value = items.value.map((item) => {
@@ -117,9 +134,18 @@ const fetchAdded = async () => {
 }
 
 const onClickAdd = async (item) => {
+  if (!isUserAuteh()) {
+    return []
+  }
+  if (!isUserAuteh()) {
+    alert('Чтоб добавить товар в корзину нужно пройти регистрацию!')
+    router.push('/profile')
+    return []
+  }
   try {
+    const userId = JSON.parse(localStorage.getItem('userId'))
     if (!item.isAdded) {
-      const obj = { sneakerId: item.id }
+      const obj = { sneakerId: item.id, userId }
       const { data } = await axios.post('https://0ea57de40f9742ea.mokky.dev/basket', obj)
       item.isAdded = true
       item.basketId = data.id

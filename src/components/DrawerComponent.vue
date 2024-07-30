@@ -3,11 +3,19 @@ import HeaderCart from './HeaderCart.vue'
 import CartItem from './CartItem.vue'
 import axios from 'axios'
 import { inject, onMounted, provide, ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 const closeDrawer = inject('closeDrawer')
-
+const router = useRouter()
 const items = ref([])
+const isUserAuteh = () => {
+  const userId = localStorage.getItem('userId')
+  return userId !== null
+}
 
 const fetchAdded = async () => {
+  if (!isUserAuteh()) {
+    return []
+  }
   try {
     const { data: added } = await axios.get(`https://0ea57de40f9742ea.mokky.dev/basket`)
     console.log(added)
@@ -41,9 +49,15 @@ const fetchItems = async () => {
 }
 
 const onClickAdd = async (item) => {
+  if (!isUserAuteh()) {
+    alert('Чтоб добавить товар в корзину нужно пройти регистрацию!')
+    router.push('/profile')
+    return []
+  }
   try {
     if (!item.isAdded) {
-      const obj = { sneakerId: item.id }
+      const userId = JSON.parse(localStorage.getItem('userId'))
+      const obj = { sneakerId: item.id, userId }
       const { data } = await axios.post('https://0ea57de40f9742ea.mokky.dev/basket', obj)
       item.isAdded = true
       item.basketId = data.id
@@ -70,6 +84,10 @@ const onClickDelete = async (sneakerId) => {
 }
 
 const totalAmount = computed(() => {
+  if (!isUserAuteh()) {
+    return 0
+  }
+
   return items.value.reduce((sum, item) => {
     return sum + (item.isAdded ? item.price : 0)
   }, 0)
