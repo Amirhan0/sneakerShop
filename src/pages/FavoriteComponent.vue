@@ -54,7 +54,9 @@ const fetchFavorites = async () => {
     return []
   }
   try {
-    const { data: favorites } = await axios.get('https://950fee513fcb3d3b.mokky.dev/favorites')
+    const { data: favorites } = await axios.get('https://950fee513fcb3d3b.mokky.dev/favorites', {
+      params: { userId }
+    })
     return favorites
   } catch (error) {
     console.log(error)
@@ -96,7 +98,9 @@ const addToFavorite = async (item) => {
       item.favoriteId = data.id
     } else {
       if (item.favoriteId) {
-        await axios.delete(`https://950fee513fcb3d3b.mokky.dev/favorites/${item.favoriteId}`)
+        await axios.delete(`https://950fee513fcb3d3b.mokky.dev/favorites/${item.favoriteId}`, {
+          params: { userId }
+        })
         item.isFavorite = false
         item.favoriteId = null
       } else {

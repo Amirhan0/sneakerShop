@@ -43,7 +43,7 @@ onMounted(() => {
   const storedEmail = localStorage.getItem('email')
   if (storedUser) {
     user.value = JSON.parse(storedUser)
-    email.value = JSON.parse(storedEmail)
+    email.value = JSON.stringify(storedEmail)
     avatarUrl.value = localStorage.getItem('avatarUrl') || ''
   }
 })

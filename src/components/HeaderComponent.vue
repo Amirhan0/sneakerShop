@@ -32,7 +32,7 @@
         </router-link>
       </template>
       <template v-else>
-        <router-link to="/profile">
+        <router-link to="/login">
           <li class="flex items-center gap-3 cursor-pointer text-gray-500 hover:text-black">
             <img src="/profile.svg" alt="" />
             <span>Профиль</span>

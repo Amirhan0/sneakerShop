@@ -67,11 +67,14 @@ const fetchItems = async () => {
 }
 
 const fetchFavorites = async () => {
+  const userId = JSON.parse(localStorage.getItem('userId'))
   if (!isUserAuteh()) {
     return []
   }
   try {
-    const { data: favorites } = await axios.get(`https://950fee513fcb3d3b.mokky.dev/favorites`)
+    const { data: favorites } = await axios.get(`https://950fee513fcb3d3b.mokky.dev/favorites`, {
+      params: { userId }
+    })
     items.value = items.value.map((item) => {
       const favorite = favorites.find((fav) => fav.sneakerId === item.id)
       if (!favorite) {
@@ -94,16 +97,18 @@ const addToFavorite = async (item) => {
     router.push('/profile')
     return []
   }
+  const userId = JSON.parse(localStorage.getItem('userId'))
   try {
     if (!item.isFavorite) {
-      const userId = JSON.parse(localStorage.getItem('userId'))
       const obj = { sneakerId: item.id, userId }
       const { data } = await axios.post('https://950fee513fcb3d3b.mokky.dev/favorites', obj)
       item.isFavorite = true
       item.favoriteId = data.id
       console.log(item)
     } else {
-      await axios.delete(`https://950fee513fcb3d3b.mokky.dev/favorites/${item.favoriteId}`)
+      await axios.delete(`https://950fee513fcb3d3b.mokky.dev/favorites/${item.favoriteId}`, {
+        data: { userId }
+      })
       item.isFavorite = false
     }
   } catch (error) {
@@ -115,8 +120,11 @@ const fetchAdded = async () => {
   if (!isUserAuteh()) {
     return []
   }
+  const userId = JSON.parse(localStorage.getItem('userId'))
   try {
-    const { data: added } = await axios.get(`https://0ea57de40f9742ea.mokky.dev/basket`)
+    const { data: added } = await axios.get(`https://0ea57de40f9742ea.mokky.dev/basket`, {
+      params: { userId }
+    })
     items.value = items.value.map((item) => {
       const basket = added.find((fav) => fav.sneakerId === item.id)
       if (!basket) {
@@ -142,8 +150,8 @@ const onClickAdd = async (item) => {
     router.push('/profile')
     return []
   }
+  const userId = JSON.parse(localStorage.getItem('userId'))
   try {
-    const userId = JSON.parse(localStorage.getItem('userId'))
     if (!item.isAdded) {
       const obj = { sneakerId: item.id, userId }
       const { data } = await axios.post('https://0ea57de40f9742ea.mokky.dev/basket', obj)
@@ -152,7 +160,9 @@ const onClickAdd = async (item) => {
       console.log(item)
       console.log('Добавлен')
     } else {
-      await axios.delete(`https://0ea57de40f9742ea.mokky.dev/basket/${item.basketId}`)
+      await axios.delete(`https://0ea57de40f9742ea.mokky.dev/basket/${item.basketId}`, {
+        data: { userId }
+      })
       item.isAdded = false
       console.log('Удалено')
     }
