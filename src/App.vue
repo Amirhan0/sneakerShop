@@ -4,29 +4,35 @@ import { ref, provide, onMounted, computed, watch } from 'vue'
 import Drawer from './components/DrawerComponent.vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+
 const openCart = ref(false)
 const openDrawer = () => {
   openCart.value = true
 }
-const router = useRouter()
-const isUserAuteh = () => {
-  const userId = localStorage.getItem('userId')
-  return userId !== null
-}
-
 const closeDrawer = () => {
   openCart.value = false
 }
+
+const userId = localStorage.getItem('userId')
+const router = useRouter()
+const isUserAuthenticated = () => {
+  return userId !== null
+}
+
 const items = ref([])
 
 const totalAmount = ref(0)
-
 const calculateTotalAmount = () => {
-  if (!isUserAuteh()) {
-    return 0
+  if (!isUserAuthenticated()) {
+    totalAmount.value = 0
+    return
   }
+
   totalAmount.value = items.value.reduce((sum, item) => {
-    return sum + (item.isAdded ? item.price : 0)
+    if (item.isAdded && item.userId === userId) {
+      return sum + (item.price || 0)
+    }
+    return sum
   }, 0)
 }
 
@@ -38,11 +44,12 @@ const fetchItems = async () => {
     const updatedItems = allItems
       .filter((item) => baskets.some((basket) => basket.sneakerId === item.id))
       .map((item) => {
-        const basket = baskets.find((basket) => basket.sneakerId === item.id)
+        const basket = baskets.find((basket) => basket.sneakerId === item.id && basket.userId === userId)
         return {
           ...item,
-          isAdded: true,
-          basketId: basket ? basket.id : null
+          isAdded: basket ? true : false,
+          basketId: basket ? basket.id : null,
+          userId: basket ? basket.userId : null
         }
       })
 
@@ -55,7 +62,9 @@ const fetchItems = async () => {
 
 const fetchAdded = async () => {
   try {
-    const { data: added } = await axios.get(`https://0ea57de40f9742ea.mokky.dev/basket`)
+    const { data: added } = await axios.get(`https://0ea57de40f9742ea.mokky.dev/basket`, {
+      params: { userId }
+    })
     return added
   } catch (error) {
     console.log(error)
@@ -67,7 +76,6 @@ watch(items, calculateTotalAmount, { deep: true })
 
 onMounted(() => {
   fetchItems()
-  fetchAdded()
 })
 provide('closeDrawer', closeDrawer)
 </script>

@@ -4,21 +4,25 @@ import CartItem from './CartItem.vue'
 import axios from 'axios'
 import { inject, onMounted, provide, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+
 const closeDrawer = inject('closeDrawer')
 const router = useRouter()
 const items = ref([])
-const isUserAuteh = () => {
-  const userId = localStorage.getItem('userId')
+
+const userId = JSON.parse(localStorage.getItem('userId'))
+
+const isUserAuthenticated = () => {
   return userId !== null
 }
 
 const fetchAdded = async () => {
-  if (!isUserAuteh()) {
+  if (!isUserAuthenticated()) {
     return []
   }
   try {
-    const { data: added } = await axios.get(`https://0ea57de40f9742ea.mokky.dev/basket`)
-    console.log(added)
+    const { data: added } = await axios.get('https://0ea57de40f9742ea.mokky.dev/basket', {
+      params: { userId }
+    })
     return added
   } catch (error) {
     console.log(error)
@@ -37,7 +41,7 @@ const fetchItems = async () => {
         const basket = baskets.find((basket) => basket.sneakerId === item.id)
         return {
           ...item,
-          isAdded: true,
+          isAdded: basket ? true : false,
           basketId: basket ? basket.id : null
         }
       })
@@ -49,20 +53,21 @@ const fetchItems = async () => {
 }
 
 const onClickAdd = async (item) => {
-  if (!isUserAuteh()) {
+  if (!isUserAuthenticated()) {
     alert('Чтоб добавить товар в корзину нужно пройти регистрацию!')
     router.push('/profile')
     return []
   }
   try {
     if (!item.isAdded) {
-      const userId = JSON.parse(localStorage.getItem('userId'))
       const obj = { sneakerId: item.id, userId }
       const { data } = await axios.post('https://0ea57de40f9742ea.mokky.dev/basket', obj)
       item.isAdded = true
       item.basketId = data.id
     } else {
-      await axios.delete(`https://0ea57de40f9742ea.mokky.dev/basket/${item.basketId}`)
+      await axios.delete(`https://0ea57de40f9742ea.mokky.dev/basket/${item.basketId}`, {
+        params: { userId }
+      })
       item.isAdded = false
     }
   } catch (error) {
@@ -75,8 +80,10 @@ const onClickDelete = async (sneakerId) => {
     const basket = items.value.find((item) => item.id === sneakerId && item.isAdded)
     if (basket) {
       const basketId = basket.basketId
-      await axios.delete(`https://0ea57de40f9742ea.mokky.dev/basket/${basketId}`)
-      items.value = items.value.filter((item) => item.id != sneakerId)
+      await axios.delete(`https://0ea57de40f9742ea.mokky.dev/basket/${basketId}`, {
+        params: { userId }
+      })
+      items.value = items.value.filter((item) => item.id !== sneakerId)
     }
   } catch (error) {
     console.log(error)
@@ -84,7 +91,7 @@ const onClickDelete = async (sneakerId) => {
 }
 
 const totalAmount = computed(() => {
-  if (!isUserAuteh()) {
+  if (!isUserAuthenticated()) {
     return 0
   }
 
@@ -158,3 +165,5 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped></style>

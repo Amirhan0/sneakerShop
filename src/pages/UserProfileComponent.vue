@@ -13,7 +13,7 @@
       <p class="font-medium text-xl">
         Email:
         <span class="cl-8BB43C">
-          {{ email.email }}
+          {{ email }}
         </span>
       </p>
     </div>
@@ -29,31 +29,51 @@
 </template>
 
 <script setup>
+import axios from 'axios'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const user = ref({})
-const email = ref({})
+const email = ref('')
 const avatarUrl = ref('')
 const fileName = ref('')
+const userId = JSON.parse(localStorage.getItem('userId'))
 
-onMounted(() => {
+onMounted(async () => {
+  try {
+    const response = await axios.get(`https://b6024bc21b8a6872.mokky.dev/avatar`)
+    const avatar = response.data.avatar
+    avatarUrl.value = avatar
+    localStorage.setItem('avatarUrl', avatar)
+  } catch (error) {
+    console.log(error)
+  }
+
   const storedUser = localStorage.getItem('user')
   const storedEmail = localStorage.getItem('email')
   if (storedUser) {
     user.value = JSON.parse(storedUser)
-    email.value = JSON.stringify(storedEmail)
+   email.value = storedEmail || ''
     avatarUrl.value = localStorage.getItem('avatarUrl') || ''
   }
 })
-const handleFileChange = (event) => {
+const handleFileChange = async (event) => {
   const file = event.target.files[0]
   if (file) {
     const reader = new FileReader()
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       avatarUrl.value = e.target.result
       localStorage.setItem('avatarUrl', avatarUrl.value)
+      try {
+        const { data } = await axios.post('https://b6024bc21b8a6872.mokky.dev/avatar', {
+          userId: userId,
+          avatar: avatarUrl.value
+        })
+        console.log(data)
+      } catch (error) {
+        console.log(error)
+      }
     }
     reader.readAsDataURL(file)
     fileName.value = file

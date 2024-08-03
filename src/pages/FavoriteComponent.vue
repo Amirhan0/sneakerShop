@@ -42,17 +42,24 @@ import { ref, onMounted } from 'vue'
 import Card from '../components/CardItem.vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+
 const items = ref([])
 const router = useRouter()
-const isUserAuteh = () => {
-  const userId = localStorage.getItem('userId')
+
+const getUserId = () => {
+  return localStorage.getItem('userId')
+}
+
+const isUserAuthenticated = () => {
+  const userId = getUserId()
   return userId !== null
 }
 
 const fetchFavorites = async () => {
-  if (!isUserAuteh()) {
+  if (!isUserAuthenticated()) {
     return []
   }
+  const userId = getUserId()
   try {
     const { data: favorites } = await axios.get('https://950fee513fcb3d3b.mokky.dev/favorites', {
       params: { userId }
@@ -85,13 +92,13 @@ const fetchItems = async () => {
 }
 
 const addToFavorite = async (item) => {
-  if (!isUserAuteh()) {
+  if (!isUserAuthenticated()) {
     router.push('/profile')
-    return []
+    return
   }
+  const userId = getUserId()
   try {
     if (!item.isFavorite) {
-      const userId = JSON.parse(localStorage.getItem('userId'))
       const obj = { sneakerId: item.id, userId }
       const { data } = await axios.post('https://950fee513fcb3d3b.mokky.dev/favorites', obj)
       item.isFavorite = true

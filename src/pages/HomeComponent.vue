@@ -33,12 +33,19 @@ import { onMounted, reactive, ref, watch } from 'vue'
 import axios from 'axios'
 import BannerComponent from '../components/BannerComponent.vue'
 import { useRouter } from 'vue-router'
+
 const items = ref([])
 const router = useRouter()
-const isUserAuteh = () => {
-  const userId = localStorage.getItem('userId')
+
+const getUserId = () => {
+  return localStorage.getItem('userId')
+}
+
+const isUserAuthenticated = () => {
+  const userId = getUserId()
   return userId !== null
 }
+
 const filters = reactive({
   sortBy: 'title',
   searchBy: ''
@@ -52,122 +59,116 @@ const fetchItems = async () => {
     if (filters.searchBy) {
       params.title = filters.searchBy
     }
-    const { data } = await axios.get(`https://269b3b45e08bcd1a.mokky.dev/items`, {
-      params
-    })
-
+    const { data } = await axios.get('https://269b3b45e08bcd1a.mokky.dev/items', { params })
     items.value = data.map((obj) => ({
       ...obj,
       isAdded: false,
       isFavorite: false
     }))
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
 const fetchFavorites = async () => {
-  const userId = JSON.parse(localStorage.getItem('userId'))
-  if (!isUserAuteh()) {
+  if (!isUserAuthenticated()) {
     return []
   }
+  const userId = getUserId()
   try {
-    const { data: favorites } = await axios.get(`https://950fee513fcb3d3b.mokky.dev/favorites`, {
+    const { data: favorites } = await axios.get('https://950fee513fcb3d3b.mokky.dev/favorites', {
       params: { userId }
     })
     items.value = items.value.map((item) => {
       const favorite = favorites.find((fav) => fav.sneakerId === item.id)
-      if (!favorite) {
-        return item
+      if (favorite) {
+        return {
+          ...item,
+          isFavorite: true,
+          favoriteId: favorite.id
+        }
       }
-      return {
-        ...item,
-        isFavorite: true,
-        favoriteId: favorite.id
-      }
+      return item
     })
   } catch (error) {
-    console.log(error)
+    console.error(error) 
   }
 }
 
 const addToFavorite = async (item) => {
-  if (!isUserAuteh()) {
+  if (!isUserAuthenticated()) {
     alert('Чтоб добавить товар в закладку нужно пройти регистрацию!')
-    router.push('/profile')
-    return []
+    router.push('/')
+    return
   }
-  const userId = JSON.parse(localStorage.getItem('userId'))
+  const userId = getUserId()
   try {
     if (!item.isFavorite) {
       const obj = { sneakerId: item.id, userId }
       const { data } = await axios.post('https://950fee513fcb3d3b.mokky.dev/favorites', obj)
       item.isFavorite = true
       item.favoriteId = data.id
-      console.log(item)
     } else {
       await axios.delete(`https://950fee513fcb3d3b.mokky.dev/favorites/${item.favoriteId}`, {
         data: { userId }
       })
       item.isFavorite = false
+      item.favoriteId = null
     }
+    items.value = [...items.value]
   } catch (error) {
-    console.log(error)
+    console.error( error) 
   }
 }
 
 const fetchAdded = async () => {
-  if (!isUserAuteh()) {
+  if (!isUserAuthenticated()) {
     return []
   }
-  const userId = JSON.parse(localStorage.getItem('userId'))
+  const userId = getUserId()
   try {
-    const { data: added } = await axios.get(`https://0ea57de40f9742ea.mokky.dev/basket`, {
+    const { data: added } = await axios.get('https://0ea57de40f9742ea.mokky.dev/basket', {
       params: { userId }
     })
     items.value = items.value.map((item) => {
       const basket = added.find((fav) => fav.sneakerId === item.id)
-      if (!basket) {
-        return item
+      if (basket) {
+        return {
+          ...item,
+          isAdded: true,
+          basketId: basket.id
+        }
       }
-      return {
-        ...item,
-        isAdded: true,
-        basketId: basket.id
-      }
+      return item
     })
   } catch (error) {
-    console.log(error)
+    console.error('Error fetching added items:', error)
   }
 }
 
 const onClickAdd = async (item) => {
-  if (!isUserAuteh()) {
-    return []
-  }
-  if (!isUserAuteh()) {
+  if (!isUserAuthenticated()) {
     alert('Чтоб добавить товар в корзину нужно пройти регистрацию!')
-    router.push('/profile')
-    return []
+    router.push('/')
+    return
   }
-  const userId = JSON.parse(localStorage.getItem('userId'))
+  const userId = getUserId()
   try {
     if (!item.isAdded) {
       const obj = { sneakerId: item.id, userId }
       const { data } = await axios.post('https://0ea57de40f9742ea.mokky.dev/basket', obj)
       item.isAdded = true
       item.basketId = data.id
-      console.log(item)
-      console.log('Добавлен')
     } else {
       await axios.delete(`https://0ea57de40f9742ea.mokky.dev/basket/${item.basketId}`, {
         data: { userId }
       })
       item.isAdded = false
-      console.log('Удалено')
+      item.basketId = null
     }
+    items.value = [...items.value]
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -176,7 +177,7 @@ const onChangeSelect = (event) => {
 }
 
 const onChangeInput = (event) => {
-  filters.searchBy = `*${event.target.value}*`
+  filters.searchBy = event.target.value
 }
 
 onMounted(async () => {
@@ -187,3 +188,5 @@ onMounted(async () => {
 
 watch(filters, fetchItems)
 </script>
+
+<style scoped></style>

@@ -44,7 +44,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch, watchEffect } from 'vue'
+import axios from 'axios'
+import { onMounted, ref, watch } from 'vue'
 
 const props = defineProps({
   totalAmount: Number,
@@ -53,21 +54,33 @@ const props = defineProps({
 
 const user = ref(null)
 const avatarUrl = ref('')
+const userId = JSON.parse(localStorage.getItem('userId'))
 
-const updateUser = () => {
+const updateUser = async () => {
   const storedUser = localStorage.getItem('user')
   if (storedUser) {
     user.value = JSON.parse(storedUser)
-    avatarUrl.value = localStorage.getItem('avatarUrl')
+    if (userId) {
+      try {
+        const response = await axios.get(`https://b6024bc21b8a6872.mokky.dev/avatar/${userId}`)
+        const avatar = response.data.avatar
+        avatarUrl.value = avatar
+        localStorage.setItem('avatarUrl', avatar)
+      } catch (error) {
+        console.error('Error fetching avatar:', error)
+      }
+    } else {
+      avatarUrl.value = localStorage.getItem('avatarUrl') || ''
+    }
   } else {
     user.value = null
+    avatarUrl.value = ''
   }
 }
 
 onMounted(() => {
   updateUser()
 })
-watchEffect(() => {
-  updateUser()
-})
+
+watch(() => localStorage.getItem('userId'), updateUser)
 </script>
