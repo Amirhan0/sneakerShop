@@ -19,9 +19,7 @@
           <div class="flex items-center justify-between">
             <span class="text-xl font-bold text-green-500">{{ product.price }}</span>
             <div class="flex gap-2">
-              <button class="btn btn-secondary" @click="editProduct(product)">
-                Редактировать
-              </button>
+              <button class="btn btn-secondary" @click="editProduct(product)">Редактировать</button>
               <button class="btn btn-error" @click="deleteProduct(product.id)">Удалить</button>
             </div>
           </div>
@@ -149,7 +147,7 @@ const addProduct = async () => {
 
 const updateProduct = async () => {
   try {
-    await axios.put(
+    await axios.patch(
       `https://269b3b45e08bcd1a.mokky.dev/items/${editingProduct.value.id}`,
       editingProduct.value
     )

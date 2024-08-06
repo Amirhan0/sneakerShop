@@ -50,7 +50,7 @@
         class="block p-2 rounded hover:bg-gray-700 cursor-pointer font-medium text-xl"
         @click="navigatePath('/addcart')"
       >
-        Добавить товар
+       Товары
       </li>
     </ul>
   </div>
