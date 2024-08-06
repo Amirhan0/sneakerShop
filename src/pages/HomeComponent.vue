@@ -91,7 +91,7 @@ const fetchFavorites = async () => {
       return item
     })
   } catch (error) {
-    console.error(error) 
+    console.error(error)
   }
 }
 
@@ -117,7 +117,7 @@ const addToFavorite = async (item) => {
     }
     items.value = [...items.value]
   } catch (error) {
-    console.error( error) 
+    console.error(error)
   }
 }
 

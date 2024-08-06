@@ -8,20 +8,21 @@
             <th class="border border-gray-300 p-2">ID</th>
             <th class="border border-gray-300 p-2">Клиент</th>
             <th class="border border-gray-300 p-2">Сумма</th>
-            <th class="border border-gray-300 p-2">Дата</th>
+            <th class="border border-gray-300 p-2">Адрес</th>
             <th class="border border-gray-300 p-2">Действия</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Example Order Row -->
-          <tr>
-            <td class="border border-gray-300 p-2">1</td>
-            <td class="border border-gray-300 p-2">Петр Петров</td>
-            <td class="border border-gray-300 p-2">$100</td>
-            <td class="border border-gray-300 p-2">2024-08-01</td>
+          <tr v-for="order in orders" :key="order.id" :class="{ 'line-through': order.isAccepted }">
+            <td class="border border-gray-300 p-2">{{ order.id }}</td>
+            <td class="border border-gray-300 p-2">{{ order.name }}</td>
+            <td class="border border-gray-300 p-2">{{ order.totalAmount }}</td>
+            <td class="border border-gray-300 p-2">{{ order.address }}</td>
             <td class="border border-gray-300 p-2">
-              <button class="btn btn-secondary mr-2">Редактировать</button>
-              <button class="btn btn-error">Удалить</button>
+              <button class="btn btn-secondary mr-2" @click="ordersAccept(order.id)">
+                Принять
+              </button>
+              <button class="btn btn-error" @click="ordersDelete(order.id)">Удалить</button>
             </td>
           </tr>
         </tbody>
@@ -30,6 +31,50 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import axios from 'axios'
+import { onMounted, ref } from 'vue'
 
-<style scoped></style>
+const orders = ref([])
+
+const ordersInformation = async () => {
+  try {
+    const response = await axios.get('https://b90d7072ae3a46c0.mokky.dev/orders')
+    orders.value = response.data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const ordersDelete = async (ordersId) => {
+  try {
+    await axios.delete(`https://b90d7072ae3a46c0.mokky.dev/orders/${ordersId}`)
+    orders.value = orders.value.filter((order) => order.id !== ordersId)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const ordersAccept = async (ordersId) => {
+  try {
+    await axios.patch(`https://b90d7072ae3a46c0.mokky.dev/orders/${ordersId}`, { isAccepted: true })
+    const updateOrders = orders.value.map((order) =>
+      order.id === ordersId ? { ...order, isAccepted: true } : order
+    )
+    orders.value = updateOrders
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+onMounted(() => {
+  ordersDelete()
+  ordersInformation()
+})
+</script>
+
+<style scoped>
+.line-through {
+  text-decoration: line-through;
+}
+</style>

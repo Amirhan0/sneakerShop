@@ -28,7 +28,7 @@
     <ul class="flex flex-col mt-4">
       <li
         class="cursor-pointer font-medium text-xl block p-2 rounded hover:bg-gray-700"
-        @click="navigatePath('/')"
+        @click="navigatePath('/dashboard')"
       >
         Главная
       </li>

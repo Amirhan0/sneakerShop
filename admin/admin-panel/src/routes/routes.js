@@ -3,6 +3,7 @@ import UsersPages from '../pages/UsersPages.vue'
 import OrdersPages from '../pages/OrdersPages.vue'
 import DashBoardPages from '../pages/DashBoardPages.vue'
 import AddCartPages from '../pages/AddCartPages.vue'
+import LoginAdmin from '../components/LoginAdminComponent.vue'
 const routes = [
   {
     path: '/users',
@@ -16,7 +17,7 @@ const routes = [
   },
 
   {
-    path: '/',
+    path: '/dashboard',
     name: 'DashBoardPages',
     component: DashBoardPages
   },
@@ -24,6 +25,12 @@ const routes = [
     path: '/addcart',
     name: 'AddCartPages',
     component: AddCartPages
+  },
+
+  {
+    path: '/',
+    name: 'LoginAdmin',
+    component: LoginAdmin
   }
 ]
 

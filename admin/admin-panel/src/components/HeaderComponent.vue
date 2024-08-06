@@ -1,5 +1,5 @@
 <template>
-  <div class="navbar bg-base-100">
+  <div v-if="statusAuthenticated" class="navbar bg-base-100">
     <div class="flex-none">
       <button class="btn btn-square btn-ghost" @click="toggleSideBar">
         <svg
@@ -18,7 +18,7 @@
       </button>
     </div>
     <div class="flex-1">
-      <router-link to='/dashboard'>
+      <router-link to="/dashboard">
         <a class="btn btn-ghost text-xl">Admin Panel</a>
       </router-link>
     </div>
@@ -65,12 +65,17 @@ const toggleCheckbox = () => {
   document.documentElement.setAttribute('data-theme', isDarkTheme.value ? 'dark' : 'lofi')
 }
 
+let statusAuthenticated = ref(false)
+
 onMounted(() => {
   const savedTheme = localStorage.getItem('theme')
   if (savedTheme) {
     isDarkTheme.value = savedTheme === 'dark'
     document.documentElement.setAttribute('data-theme', savedTheme)
   }
+
+  const authStatus = localStorage.getItem('statusAuthenticated')
+  statusAuthenticated.value = authStatus === 'true'
 })
 
 const toggleSideBar = inject('toggleSideBar')
