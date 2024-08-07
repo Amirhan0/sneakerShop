@@ -5,7 +5,7 @@
       <select
         @change="onChangeSelect"
         class="border border-gray-200 rounded-md outline-none py-2 px-2"
-      > 
+      >
         <option value="title">По названию</option>
         <option value="price">По возрастанию цены</option>
         <option value="-price">По убыванию цены</option>
